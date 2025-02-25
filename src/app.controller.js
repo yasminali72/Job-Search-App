@@ -5,8 +5,9 @@ import userController from "./modules/user/user.controller.js"
 import jobController from "./modules/job/job.controller.js"
 import companyController from "./modules/company/company.controller.js"
 import { globalErrorHandling } from './utils/response/error.response.js'
-
+import cors from "cors"
 const bootstrap = (app, express) => {
+    app.use(cors())
     app.use(express.json())
 
     app.get("/", (req, res, next) => {

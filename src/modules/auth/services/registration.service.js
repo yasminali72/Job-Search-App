@@ -1,10 +1,11 @@
-import userModel from "../../../DB/model/User.model.js";
+import userModel, { providerTypes, roleTypes } from "../../../DB/model/User.model.js";
 import { emailEvent } from "../../../utils/events/email.event.js";
 import { asyncHandler } from "../../../utils/response/error.response.js";
 import { sucessResponse } from "../../../utils/response/sucess.response.js";
 import { generateEncryption, generatedecryption } from "../../../utils/security/encryption.security.js";
 import { compareHash, generateHash } from "../../../utils/security/hash.security.js";
-
+import jwt from "jsonwebtoken"
+import { generateToken } from "../../../utils/security/token.security.js";
 // sign up
 export const signup=asyncHandler(async(req,res,next)=>{
 const {firstName,lastName,email,mobileNumber,gender,password,birthYear}=req.body
@@ -18,7 +19,55 @@ const user=await userModel.create({email,firstName,lastName,mobileNumber:encrypt
 emailEvent.emit("sendConfirmEmail",{email,type:"confirmEmail",subject:"confirm email",user})
 return res.status(201).json({message:"signup",data:{user}})
 })
-
+// sign up with google
+export const signupWithGoogle = asyncHandler(async (req, res, next) => {
+   const { token } = req.body;
+ 
+   if (token) {
+     const payload = jwt.decode(token);
+     console.log(payload);
+     if (!payload?.email_verified) {
+       return next(new Error("in-valid account"));
+     }
+     let user = await userModel.findOne({ email: payload.email });
+     if (!user) {
+      user= await userModel.create({
+         firstName: payload.given_name,
+         lastName: payload.family_name,
+         email: payload.email,
+         profilePic: payload.image,
+         provider: providerTypes.google,
+        
+       });
+       const access_token = generateToken({
+         payload: { id: user._id },
+         signature:
+           user.role === roleTypes.Admin
+             ? process.env.ADMIN_ACCESS_TOKEN
+             : process.env.USER_ACCESS_TOKEN,
+       });
+       const refresh_token = generateToken({
+         payload: { id: user._id },
+         signature:
+           user.role === roleTypes.Admin
+             ? process.env.ADMIN_REFRESH_TOKEN
+             : process.env.USER_REFRESH_TOKEN,
+         expiresIn: 31536000,
+       });
+       return sucessResponse({
+         res,
+         message: "signup is done"
+        ,data:{access_token,refresh_token}
+       });
+    
+     }
+ 
+   
+   return next(new Error("account is registered before"))
+      
+   }
+   return next(new Error("token is required"));
+ });
 // confirm email
 export const confirmEmail = asyncHandler(async(req, res, next) => {
   

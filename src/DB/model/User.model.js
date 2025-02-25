@@ -2,7 +2,8 @@ import mongoose, { Schema, model } from "mongoose";
 import moment from "moment";
 
 export const roleTypes={Admin:"Admin",User:"User"}
-
+export const providerTypes={google:"Google",system:"System"}
+export const genderTypes={male:"Male",female:"Female"}
 const userSchema = new Schema(
   {
     firstName: {
@@ -25,21 +26,24 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, "password is required"],
+      required: (data)=>{
+        console.log(data);
+        return data?.provider === providerTypes.google? false :true
+      },
     },
     provider: {
       type: String,
-      enum: ["google", "system"],
-      default: "system",
+      enum: Object.values(providerTypes),
+      default:providerTypes.system
     },
     gender: {
       type: String,
-      enum: ["Male", "Female"],
-      default: "male",
+      enum: Object.values(genderTypes),
+      default:genderTypes.male,
     },
     DOB: {
       type: Date,
-      required: [true, "Date of Birth is required"],
+      // required: [true, "Date of Birth is required"],
       validate: {
         validator: function (value) {
           const now = moment().startOf("day");
@@ -54,7 +58,7 @@ const userSchema = new Schema(
     },
     mobileNumber: {
       type: String,
-      required: [true, "mobileNumber  is required"],
+      // required: [true, "mobileNumber  is required"],
     },
     role: {
       type: String,
