@@ -127,7 +127,7 @@ if (user) {
         return next(new Error("in-valid email"))
        }
        if (!user.isForgetPassword) {
-        emailEvent.emit("sendConfirmEmail",{email,type:"forgetPassword",subject:"forget password",user})
+        emailEvent.emit("sendOTP",{email,type:"forgetPassword",subject:"forget password",user})
        await userModel.findOneAndUpdate({email},{isForgetPassword:true})
        return sucessResponse({res,message:"code is sent"})
        

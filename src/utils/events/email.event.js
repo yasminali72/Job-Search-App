@@ -6,7 +6,7 @@ import { sendEmail } from "../email/send.email.js";
 import { verifyAccountTemplate } from "../templates/verifyAccount.template.js";
 
 export const emailEvent=new EventEmitter()
-emailEvent.on("sendConfirmEmail",async(data)=>{
+emailEvent.on("sendOTP",async(data)=>{
 const{email,type,subject,user}=data
 const otp=customAlphabet("0123456789",4)()
 const hahOTP=generateHash({plainText:otp})

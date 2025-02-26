@@ -16,7 +16,7 @@ if (await userModel.findOne({email})) {
 const hashPassword=generateHash({plainText:password})
 const encryptPhone=generateEncryption({plainText:mobileNumber})
 const user=await userModel.create({email,firstName,lastName,mobileNumber:encryptPhone,password:hashPassword,gender,DOB:birthYear})
-emailEvent.emit("sendConfirmEmail",{email,type:"confirmEmail",subject:"confirm email",user})
+emailEvent.emit("sendOTP",{email,type:"confirmEmail",subject:"confirm email",user})
 return res.status(201).json({message:"signup",data:{user}})
 })
 // sign up with google
