@@ -1,7 +1,6 @@
 import { customAlphabet } from "nanoid";
 import { EventEmitter } from "node:events";
 import { generateHash } from "../security/hash.security.js";
-import userModel from "../../DB/model/User.model.js";
 import { sendEmail } from "../email/send.email.js";
 import { verifyAccountTemplate } from "../templates/verifyAccount.template.js";
 import companyModel from "../../DB/model/Company.model.js";
