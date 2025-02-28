@@ -8,7 +8,7 @@ export const signup=joi.object().keys({
     password:generalFields.password.required(),
     conformationPassword:generalFields.confrimationPassword.required(),
     gender:generalFields.gender.required(),
-    birthYear:generalFields.birthYear.required(),
+    DOB:generalFields.birthYear.required(),
     mobileNumber:generalFields.mobileNumber.required()
 }).required()
 

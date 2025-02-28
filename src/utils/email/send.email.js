@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail=async( {to=[],cc=[],html="",bcc=[],text="",subject="social app",attachments=[]}={})=>{
+export const sendEmail=async( {to=[],cc=[],html="",bcc=[],text="",subject="job search app",attachments=[]}={})=>{
    
 
 const transporter = nodemailer.createTransport({

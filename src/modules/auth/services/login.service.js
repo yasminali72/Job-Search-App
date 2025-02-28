@@ -1,15 +1,19 @@
+import { Error } from "mongoose"
 import userModel, { providerTypes, roleTypes } from "../../../DB/model/User.model.js"
 import { emailEvent } from "../../../utils/events/email.event.js"
 import { asyncHandler } from "../../../utils/response/error.response.js"
 import { sucessResponse } from "../../../utils/response/sucess.response.js"
 import { compareHash, generateHash } from "../../../utils/security/hash.security.js"
-import { generateToken, verifyToken } from "../../../utils/security/token.security.js"
+import { decodedToken, generateToken, tokenTypes, verifyToken } from "../../../utils/security/token.security.js"
 import jwt from "jsonwebtoken"
 export const login=asyncHandler(async(req,res,next)=>{
     const {email,password}=req.body
     const user=await userModel.findOne({email,provider:providerTypes.system})
     if (!user) {
         return next(new Error("in-valid data",{cause:404}))
+    }
+    if (user.isDeleted) {
+      return next(new Error("Account is freezed"))
     }
     if (!user.isConfirmed) {
         return next(new Error("please confirm your email first",{cause:409}))
@@ -25,7 +29,7 @@ export const login=asyncHandler(async(req,res,next)=>{
         const refresh_token=generateToken({payload:{id:user._id},
             signature:user.role===roleTypes.Admin?process.env.ADMIN_REFRESH_TOKEN : process.env.USER_REFRESH_TOKEN,expiresIn:604800
             })
-    return sucessResponse({res,message:"Login",data:{access_token,refresh_token}})
+    return sucessResponse({res,message:"Login",data:{access_token,refresh_token,role:user.role}})
     })
 
     export const loginWithGoogle = asyncHandler(async (req, res, next) => {
@@ -79,34 +83,7 @@ export const login=asyncHandler(async(req,res,next)=>{
 
     export const refreshToken=asyncHandler(async(req,res,next)=>{
         const {authorization}=req.headers
-        const [bearer,token]=authorization?.split(" ")|| []
-        if (!bearer  || !token) {
-            return next (new Error("missing token",{cause:400}))
-        }
-    let signature=''
-        switch (bearer) {
-            case "System":
-                signature=process.env.ADMIN_REFRESH_TOKEN
-                break;
-        case"Bearer":
-        signature=process.env.USER_REFRESH_TOKEN
-        break;
-            default:
-                break;
-        }
-    
-        const decoded=verifyToken({token,signature})
-        if (!decoded?.id) {
-            return next (new Error("in-valid token payload",{cause:404}))
-        }
-        const user=await userModel.findOne({_id:decoded.id,isDeleted:false})
-        if (!user) {
-            return next (new Error("not registered account",{cause:404}))
-        }
-        if (user.changeCredentialTime?.getTime()>=decoded.iat*1000 ) {
-            return next (new Error("in-valid login Cridentials",{cause:400}))
-        
-        }
+      const user=await decodedToken({authorization,tokenType:tokenTypes.refresh,next})
         const access_token=generateToken({payload:{id:user._id},
             signature:user.role===roleTypes.Admin?process.env.ADMIN_ACCESS_TOKEN : process.env.USER_ACCESS_TOKEN
             })

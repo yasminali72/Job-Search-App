@@ -1,3 +1,4 @@
+import path from "node:path"
 import connectDB from './DB/connection.js'
 import authController from './modules/auth/auth.controller.js'
 
@@ -8,7 +9,10 @@ import { globalErrorHandling } from './utils/response/error.response.js'
 import cors from "cors"
 const bootstrap = (app, express) => {
     app.use(cors())
+    app.use("/uploads",express.static(path.resolve("./src/uploads")))
+
     app.use(express.json())
+
 
     app.get("/", (req, res, next) => {
         return res.status(200).json({ message: "Welcome in node.js project powered by express and ES6" })

@@ -87,7 +87,7 @@ const userSchema = new Schema(
       public_id:String
     },
     coverPic:{
-      secure_url: String,
+      secure_url:String,
       public_id:String
     },
     OTP: [{

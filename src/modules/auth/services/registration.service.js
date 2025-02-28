@@ -6,6 +6,7 @@ import { generateEncryption, generatedecryption } from "../../../utils/security/
 import { compareHash, generateHash } from "../../../utils/security/hash.security.js";
 import jwt from "jsonwebtoken"
 import { generateToken } from "../../../utils/security/token.security.js";
+import * as dbServices from "../../../DB/db.services.js"
 // sign up
 export const signup=asyncHandler(async(req,res,next)=>{
 const {firstName,lastName,email,mobileNumber,gender,password,birthYear}=req.body
@@ -13,9 +14,8 @@ const {firstName,lastName,email,mobileNumber,gender,password,birthYear}=req.body
 if (await userModel.findOne({email})) {
    return next(new Error("email exists"))
 }
-const hashPassword=generateHash({plainText:password})
-const encryptPhone=generateEncryption({plainText:mobileNumber})
-const user=await userModel.create({email,firstName,lastName,mobileNumber:encryptPhone,password:hashPassword,gender,DOB:birthYear})
+
+const user=await dbServices.create({model:userModel,data:{email,firstName,lastName,mobileNumber:generateEncryption({plainText:mobileNumber}),password:generateHash({plainText:password}),gender,DOB:birthYear}})
 emailEvent.emit("sendOTP",{email,type:"confirmEmail",subject:"confirm email",user})
 return res.status(201).json({message:"signup",data:{user}})
 })

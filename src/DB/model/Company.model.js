@@ -21,7 +21,7 @@ const companySchema = new Schema(
       trim: true,
     },
     address: {
-      tpe: String,
+      type: String,
       required: [true, "address is required"],
       trim: true,
     },
@@ -37,7 +37,7 @@ const companySchema = new Schema(
         "101-500",
         "501-1000",
         "1001+",
-      ],
+      ]
     },
     companyEmail: {
       type: String,
@@ -70,6 +70,13 @@ const companySchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isDeleted :{
+      type:Boolean,
+      default:false
+    },
+    password:{type:String,
+    required:true},
+    OTPforApproved:String
   },
   { timestamps: true }
 );

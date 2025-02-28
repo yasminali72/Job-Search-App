@@ -4,6 +4,7 @@ import { generateHash } from "../security/hash.security.js";
 import userModel from "../../DB/model/User.model.js";
 import { sendEmail } from "../email/send.email.js";
 import { verifyAccountTemplate } from "../templates/verifyAccount.template.js";
+import companyModel from "../../DB/model/Company.model.js";
 
 export const emailEvent=new EventEmitter()
 emailEvent.on("sendOTP",async(data)=>{
@@ -41,4 +42,12 @@ emailEvent.on("resendCode",async(data)=>{
    await user.save()   
 
     await sendEmail({to:email,subject ,html})
+    })
+
+    emailEvent.on("OTPforApprovedByAdmin",async({email,id})=>{
+        const otp=customAlphabet("0123456789",4)()
+const hahOTP=generateHash({plainText:otp})
+const html=verifyAccountTemplate({code:otp})
+await companyModel.findByIdAndUpdate(id,{OTPforApproved:hahOTP})
+await sendEmail({to:email,subject:"Approve Company",html})
     })

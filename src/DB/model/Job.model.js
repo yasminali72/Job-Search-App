@@ -37,8 +37,8 @@ const jobSchema = new Schema(
     },
     addedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "Job must be added by an HR"],
+      ref: "User" ||"Company",
+      required: [true, "Job must be added by an HR or owner "],
     },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
