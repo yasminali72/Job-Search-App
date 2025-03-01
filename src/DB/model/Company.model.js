@@ -78,8 +78,8 @@ const companySchema = new Schema(
     required:true},
     OTPforApproved:String
   },
-  { timestamps: true }
+  { timestamps: true ,toJSON:{virtuals:true},toObject:{virtuals:true}}
 );
-
+companySchema.virtual("jobs",{ref:"Job",localField:"_id",foreignField:"companyId"})
 const companyModel = mongoose.models.Company || model("Company", companySchema);
 export default companyModel;

@@ -7,7 +7,7 @@ import { sucessResponse } from "../../../utils/response/sucess.response.js";
 import { compareHash, generateHash } from "../../../utils/security/hash.security.js";
 import { generateToken } from "../../../utils/security/token.security.js";
 
-
+// register
 export const signUpCompany=asyncHandler(async(req,res,next)=>{
 
 const {companyEmail,numberOfEmployees,address,industry,description,companyName,createdBy,password}=req.body
@@ -88,7 +88,7 @@ export const getAllCompanies=asyncHandler(async(req,res,next)=>{
     const companies=await companyModel.find()
     return sucessResponse({res,message:"All companies retrieved successfully",data:{companies}})
 })
-
+// update company
 export const updateCompany=asyncHandler(async(req,res,next)=>{
     const {_id}=req.user
     const {numberOfEmployees,address,industry,description,companyName}=req.body
@@ -97,7 +97,7 @@ const company=await companyModel.findByIdAndUpdate(_id,{numberOfEmployees,addres
 return sucessResponse({res,message:"updated",data:{company}})
 })
 
-// add hr by owner  or admin
+// add hr to company by owner  or admin
 export const addHr=asyncHandler(async(req,res,next)=>{
 
     const{_id}=req.user
@@ -133,29 +133,31 @@ return sucessResponse({res,message:"account of comany is deleted",data:{company}
 
 })
 
-// get  specific commpany and all jobs
+// get  specific commpany by company id and all jobs
 
 export const allJobsForSpecificCommpany=asyncHandler(async(req,res,next)=>{
     const{companyId}=req.params
-    const company=await companyModel.findOne({_id:companyId,isDeleted:false})
+    const company=await companyModel.findOne({_id:companyId,isDeleted:false}).populate("jobs")
+    console.log(company);
     if (!company) {
         return next(new Error("company not found",{cause:404}))
     }
-    const jobs=await jobModel.find({companyId:companyId})
-    if (jobs.length==0) {
-        return next(new Error("No found jobs for this company"))
+    if (company.jobs.length==0) {
+        return sucessResponse({res,message:"No jobs for this company",data:{company,lengthOfJobs:company.jobs.length}})
     }
-   return sucessResponse({res,message:"all jobs",data:{company,jobs,length:jobs.length}})
+   return sucessResponse({res,message:"all jobs",data:{company,lengthOfJobs:company.jobs.length}})
 })
 // get Company By Name and jobs
 export const getCompanyByName=asyncHandler(async(req,res,next)=>{
 const{companyName}=req.params
-const company=await companyModel.findOne({companyName,isDeleted:false})
+const company=await companyModel.findOne({companyName,isDeleted:false}).populate("jobs")
 if (!company) {
     return next(new Error("compnay not found",{cause:404}))
 }
+if (company.jobs.length==0) {
+    return sucessResponse({res,message:"No jobs for this company",data:{company,lengthOfJobs:company.jobs.length}})
+}
 
-const jobs=await jobModel.find({companyId:company._id})
-return sucessResponse({res,message:"the company",data:{company,jobs}})
+return sucessResponse({res,message:"the company is relatived",data:{company,lengthOfJobs:company.jobs.length}})
 
 })

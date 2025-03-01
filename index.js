@@ -7,7 +7,7 @@ dotenv.config(
     {path:path.join('./src/config/.env.prod')}
 )
 const app = express()
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 5000;
 
 
 bootstrap(app , express)
