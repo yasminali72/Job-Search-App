@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
   
   const info = await transporter.sendMail({
-    from: `"Job Search App 👻" <${process.env.EMAIL}>`, // sender address
+    from: `"Job Search App" <${process.env.EMAIL}>`, // sender address
     to,cc,html,bcc,text,subject,attachments
   });
 
