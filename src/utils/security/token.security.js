@@ -10,7 +10,7 @@ export const decodedToken=async({authorization="",tokenType=tokenTypes.access,ne
     if (!bearer  || !token) {
         return next (new Error("missing token",{cause:400}))
     }
-let access_signature='';
+let access_signature="";
 let refresh_signature=""
     switch (bearer) {
         case "Admin":
